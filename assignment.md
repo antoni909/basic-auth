@@ -1,122 +1,84 @@
-# Data Modeling
+# Authentication
 
-Dynamic API Phase 3: Add Database Abstraction and Associations to your API
-
-Today’s lab adds no new requirements to the API server. Our goal today is to swap out the route handler functions in favor of a Collection Interface which will consume a Sequelize Model and perform generic Database CRUD operations. You should consider this a “refactor” of your previous assignment, but treat this as a new build – do not simply copy your previous files and start working. Rebuild the server, re-asserting your knowledge of how it works, how it’s architected, and how to operate it.
+Authentication System Phase 1: Deploy an Express server that implements Basic Authentication, with signup and signin capabilities, using a Postgres database for storage.
 
 Before you begin
+Create a UML diagram of the authentication system on a whiteboard before you start
+
 Refer to the Getting Started guide in the lab submission instructions
-Create a new repository called api-server
+Create a new repository called basic-auth
+Copy the files from within the starter-code folder of your class repository into your new repo as a starting point
 Work in a new branch called dev, created from main
 Following completion of this assignment, create a Pull Request from dev to main and merge your code
 You will deploy from your main branch to a new app at Heroku
 You will add a link to the PR that you merged in your README for grading purposes
-Note: You should have a working express server from previous assignments. Use this as your reference. Today’s lab will have you replicating 100% of the functionality, but using the Collection Class instead of Sequelize Models directly. Resist the urge to copy your previous work and use it as a starting point. Rather, re-type the code from your working server, seeking to understand how it works and how it wires up. Then, approach the lab requirements below, which are principally focused on changing route handlers.
+Business Requirements
+Refer to the Authentication System Overview for a complete review of the final application, including Business and Technical requirements along with the development roadmap.
 
-Phase 3 Requirements
-Build a REST API using Express, by creating a proper series of endpoints that perform CRUD operations on a Postgres SQL Database, using the REST standard
+Phase 1 Requirements
+Today, we begin the first of a 3-Phase build of an authentication system, written in Express. The following core requirements detail the functionality for this phase of the project.
 
-Data Models
-Create 2 SQL data models using Sequelize, exported as Node Modules
-Create a Collection Class that accepts a Sequelize Model into the constructor and assigns it as this.model
-This class should have the following methods defined, to perform CRUD Operations
-Each method should in turn call the appropriate Sequelize method for the model
-create()
-get() or read()
-update()
-delete()
-For the data models, you are free to choose your own data types and describe their fields … For Example: person, animal, car, instrument, game
+As a user, I want to create a new account so that I may later login
+Using a tool such as httpie, postman, or a web form:
+Make a POST request to the/signup route with username and password
+Your server should support both JSON and FORM data as input
+On a successful account creation, return a 201 status with the user object in the body
+On any error, trigger your error handler with an appropriate error
+As a user, I want to login to my account so that I may access protected information
+Using a tool such as httpie, postman, or a web form:
+Make a POST request to the /signin route
+Send a basic authentication header with a properly encoded username and password combination
+On a successful account login, return a 200 status with the user object in the body
+On any error, trigger your error handler with the message “Invalid Login”
+Technical Requirements / Notes
+You have been supplied a “monolithic” express server in the starter-code folder which fulfills the above requirements. To complete the work for this phase, refactor the provided server using best practices, modularizing the code and providing tests, as follows:
 
-Routes
-In your express server, create a router module for each data model that you’ve created. Within the router module, create REST route handlers for each of the REST Methods that properly calls the correct CRUD method from the matching data model.
+Basic Server
+Extract the core server logic into 2 files:
+index.js (entry point)
+Connect to the database
+Require the ‘server’ and start it
+server.js service wiring
+Exports an express app/server and a start method
+Authentication Modules
+Keep your authentication related files in a folder called /auth so they are independent of the server itself.
 
-For these examples, we’ll use ‘food`
+Extract the authentication logic for /signin as middleware.
+Create a new node module.
+Interact with the headers and the users model.
+Add the user record (if valid) to the request object and call next().
+Call next() with an error in the event of a bad login.
+Extract the Sequelize Model into a separate module.
+Model the user data.
+Add a before-create hook in the model … Before we save a record:
+Hash the plain text password given before you save a user to the database.
+Create a method in the schema to authenticate a user using the hashed password.
+Create a module to house all of routes for the authentication system.
+Create a POST route for /signup
+Accepts either a JSON object or FORM Data with the keys “username” and “password”.
+Creates a new user record in a Postgres database.
+Returns a 201 with the created user record.
+Create a POST route for /signin.
+Use your basic authentication middleware to perform the actual login task.
+router.post('/signin', basicAuth, (req,res) => {});
+When validated, send a JSON object as the response with the following properties:
+user: The users’ database record
+Testing
+You should manually test your routes using httpie from the command line or an application such as Postman or Insomnia. Additionally, you are required to write automated tests as well:
 
-Add a Record
-CRUD Operation: Create
-REST Method: POST
-Path: /food
-Input: JSON Object in the Request Body
-Returns: The record that was added to the database.
-You must generate an ID and attach it to the object.
-You should verify that only the fields you define get saved as a record.
-Get All Records
-CRUD Operation: Read
-REST Method: GET
-Path: /food
-Returns: An array of objects, each object being one entry from your database.
-Get One Record
-CRUD Operation: Read
-REST Method: GET
-Path: /food/1
-Returns: The object from the database, which has the id matching that which is in the path.
-Update A Record
-CRUD Operation: Update
-REST Method: PUT
-Path: /food/1
-Input: JSON Object in the Request Body
-Returns: The object from the database, which has the id matching that which is in the path, with the updated/changed data.
-You should verify that only the fields you define get saved as a record.
-Delete A Record
-CRUD Operation: Destroy
-REST Method: DELETE
-Path: /food/1
-Returns: The record from the database as it exists after you delete it (i.e. null).
-Implementation Notes
-Create an express server with the following proposed structure
-├── .gitignore
-├── .eslintrc.json
-├── __tests__
-│   ├── server.test.js
-│   ├── logger.test.js
-├── src
-│   ├── error-handlers
-│   │   ├── 404.js
-│   │   ├── 500.js
-│   ├── middleware
-│   │   ├── logger.js
-│   │   ├── validator.js
-│   ├── models
-│   │   ├── collection-class.js
-│   │   ├── index.js
-│   │   ├── food.js
-│   │   ├── clothes.js
-│   ├── routes
-│   │   ├── food.js
-│   │   ├── clothes.js
-│   ├── server.js
-├── index.js
-└── package.json
-In your server.js, require() your router modules, and use() them
-In your routers
-require() the correct data model
-require() the collection class
-Make a new instance of the collection, using the model as a parameter
-Your routes, if you followed the API pattern from your previous assignments should already be set up to call the right methods in your collection
-Remember, Sequelize methods are asynchronous. Be sure and account for this!
-Testing Requirements
-Be sure to specify NODE_ENV=test in your package.json test script.
-Assert the following
-404 on a bad route
-404 on a bad method
-The correct status codes and returned data for each REST route
-Create a record using POST
-Read a list of records using GET
-Read a record using GET
-Update a record using PUT
-Destroy a record using DELETE
-Deployment
-Your server must be deployed to Heroku. Please note the deployed URL in your README!
+POST to /signup to create a new user
+POST to /signin to login as a user (use basic auth)
+Need tests for auth middleware and the routes
+Does the middleware function (send it a basic header)
+Do the routes assert the requirements (signup/signin)
+This is going to require more “end to end” testing that you’ve done in the past
+To test signin, your tests actually need to create a user first, then try and login, so there’s a dependency built in
+Visual Validation
+We have deployed a web application that’s designed to test your API. This is a good way to ensure that your API works as expected. There’s nothing to “turn in” here, this is provided for your benefit.
 
-Stretch Goal
-Currently, as you add new models (imagine a system with 100 or more data models), you need to continually build new routes to use each model. Given that the code in the route modules is virtually identical (save for the require() of the correct data model), we should find a way to DRY this system.
-
-Create a new route module called v1 as a copy of one of your other, working routes
-require() and use() this new router in your server
-Assign the /api/v1 prefix to these routes.
-Devise a way that you can require() the correct data model file based on the route
-i.e.
-http://localhost:3000/api/v1/clothes should require and use the file models/clothes.js
-http://localhost:3000/api/v1/food should require and use the file models/food.js
-Hint: use a route parameter along with middleware … you might need to do some research
-Once you have this working, delete your other (now no longer needed) route modules and the references to them in your server
+Open this Web Application
+Click the “Module 3 (AUTH)” / Basic Auth link
+In the form at the top of the page, enter the URL to your Authentication Server
+If your lab is working, this app will show your user record after you login
+Assignment Submission Instructions
+Refer to the the Submitting Standard Node.js Lab Submission Instructions for the complete lab submission process and expectations
