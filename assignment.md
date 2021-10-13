@@ -67,12 +67,16 @@ Testing
 You should manually test your routes using httpie from the command line or an application such as Postman or Insomnia. Additionally, you are required to write automated tests as well:
 
 POST to /signup to create a new user
+
 POST to /signin to login as a user (use basic auth)
 Need tests for auth middleware and the routes
 Does the middleware function (send it a basic header)
+
 Do the routes assert the requirements (signup/signin)
 This is going to require more “end to end” testing that you’ve done in the past
+
 To test signin, your tests actually need to create a user first, then try and login, so there’s a dependency built in
+
 Visual Validation
 We have deployed a web application that’s designed to test your API. This is a good way to ensure that your API works as expected. There’s nothing to “turn in” here, this is provided for your benefit.
 

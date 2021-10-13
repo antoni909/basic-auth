@@ -1,11 +1,56 @@
 # General Notes
 
-## My personal Trouble Shootig notes
+## TOC
+
+### Trouble Shootig notes
 
 - BUG: Connection Error Sequelize: failed to connect to database: 'store'
 - FIX:
     go into my psql and CREATE DATABASE store;
 
+### Authorization vs Authentication
+
+Authorization:
+
+    already authenticated and...
+    Are you allowed to do what you are requesting?
+
+Authentication:
+
+    who is making a request?
+
+        Bearer Authentication:
+        Auth0 ---gives---> Token (info about user target, i.e. email, profile pic etc...)
+        hence, "Bearer Auth" of said token
+
+        Basic Authentication
+        using 2 strings
+            username or email
+            password
+        
+            Authorization Header:
+            contains encoded string that includes username/email & pw
+        
+            Authorization (really authentication credentials) Middleware:
+                checks header for authorization object
+                needs to verify presence of user by given name/email
+                Validate authenticity of password using encryption lib (bcrypt)
+
+### Login a User
+
+    req.headers.authorization is : "Basic sdkjdsljd="
+    To get username and password from this, take the following steps:
+      - Turn that string into an array by splitting on ' '
+      - Pop off the last value
+      - Decode that encoded string so it returns to user:pass
+      - Split on ':' to turn it into an array
+      - Pull username and password from that array
+
+    Now that we finally have username and password, let's see if it's valid
+    1. Find the user in the database by username
+    2. Compare the plaintext password we now have against the encrypted password in the db
+       - bcrypt does this by re-encrypting the plaintext password and comparing THAT
+    3. Either we're valid or we throw an error
 ### PostgresQL
 
 - allow route handlers to interact with in-memory server 
