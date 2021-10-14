@@ -1,13 +1,25 @@
 'use strict';
 
-const { User } = require('./models/index');
+const bcrypt = require('bcrypt');
+const base64 = require('base-64');
+const { User } = require('../models/index');
 
-// perform a function before you create and save a new user
-async function beforeRegister(){
-  // what might we want to do programmatically before User data is persisted?
-  await User.beforeCreate((user,options)=>{
-    console.log(user);
-  });
+async function basicAuthentication(req, res, next){
+
+  let basicHeaders = req.headers.authorization.split(' ');
+  let encodedString = basicHeaders.pop();
+  let decodedString = base64.decode(encodedString);
+  let [username,password] = decodedString.split(':');
+
+  // const userFromDB = await User.findOne({ where: { username} });
+  // const isValid = await bcrypt.compare(password, userFromDB.password);
+
+  req.user = await User.auth(username,password);
+  next();
+
+  // (isValid)
+  //   ? (res.locals.userFromDB = userFromDB) && next()
+  //   : next('Authentication Err');
 }
 
-module.exports = beforeRegister;
+module.exports = basicAuthentication;

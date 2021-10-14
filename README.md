@@ -8,7 +8,7 @@
     <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
   </a>
   <a href="https://github.com/antoni909/api-server/blob/master/LICENSE" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/github/license/antoni909/basic-api-server" />
+    <img alt="License: MIT" src="https://img.shields.io/github/license/antoni909/basic-auth" />
   </a>
 </p>
 
@@ -16,21 +16,22 @@
 
 ### 🏠 [GitHub Repo](https://github.com/antoni909/basic-auth)
 
-### ✨ [Heroku Production Deployment](#blank)
+### ✨ [Heroku Production Deployment](https://basic-auth.herokuapp.com/)
 
 ### Routes
 
 Endpoint:
 
   ```sh
-    /signup
+    /register
   
-    /signin
+    /login
   ```
 
 ### UML
 
-![UML basic-auth](assets/UML_Basic_Auth.jpg)
+![UML express app](assets/UML_BasicAuth.jpg)
+![basic-authentication](assets/UML_Basic_Auth.jpg)
 
 ### Techonology Used
 
@@ -49,6 +50,18 @@ Endpoint:
 
 ### CRUD / REST
 
+POST route for /register
+
+    Accepts either a JSON object or FORM Data with the keys “username” and “password”.
+    Creates a new user record in a Postgres database.
+    Returns a 201 with the created user record.
+
+POST route for /login.
+
+    Use your basic authentication middleware to perform the actual login task.
+    When validated, sends JSON users record
+
+
 ### DOCS USED
 
 [Express and Express Router](https://expressjs.com/en/4x/api.html#router.route)
@@ -60,7 +73,7 @@ Endpoint:
 
 [Home Repo](https://github.com/antoni909/basic-auth)
 
-[PR - dev to main](https://github.com/antoni909/basic-auth/pull)
+[PR - dev to main](https://github.com/antoni909/basic-auth/pull/2)
 
 [Assignment Instructions - Lab 06](./assignment.md);
 

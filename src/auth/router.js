@@ -1,49 +1,41 @@
 'use strict';
 
 const express = require('express');
-const basicAuthRouter = express.Router();
-const bcrypt = require('bcrypt');
-const base64 = require('base-64');
-const beforeRegistering = require();
+const authRouter = express.Router();
+const authUser = require('./middleware/basic');
 const { User } = require('./models/index');
 
-// Register Route --> create a new user
-// http post :3000/signup
-// http post :3000/signup usernmae=john password=foo
-basicAuthRouter.post('/resgister', beforeRegistering ,registerUser);
+authRouter.get('/', greetUser);
+authRouter.post('/register', registerUser);
+authRouter.post('/login',authUser,loginUser);
 
-// Login Route -- login with username and password
-// http post :3000/login -a john:foo
-basicAuthRouter.post('/login',loginUser);
+async function greetUser(req,res){
+  let message = 'hola, welcome to basic auth app 👋 ';
+  res.status(200).send(message);
+}
 
 async function registerUser(req,res){
+  
   try{
-    req.body.password = await bcrypt.hash(req.body.password,10);
+
+    // req.body.password = await bcrypt.hash(req.body.password,10);
     const record = await User.create(req.body);
-    res.status(200).json(record);
+    res.status(201).json(record);
+
   }catch(e){
     res.status(403).send(`ERR Registering User`);
   }
 }
 
 async function loginUser(req,res){
-  
-  let basicHeaders = req.headers.authorization.split(' ');
-  let encodedString = basicHeaders.pop();
-  let decodedString = base64.decode(encodedString);
-  let [username,password] = decodedString.split(':');
-
   try{
-  
-    const user = await User.findOne({ where: { username} });
-    const valid = await bcrypt.compare(password, user.password);
-    if(valid){
-      res.status(200).json(user);
-    }
+    // let { userFromDB  } = res.locals;
+    // console.log('******',req.user);
 
-  } catch(e) {
-    res.status(403).send('Invalid Login'); 
+    res.status(200).json(req.user);
+  }catch(e){
+    console.log('*** router e: ',e);
   }
 }
 
-module.exports = basicAuthRouter;
+module.exports = authRouter;

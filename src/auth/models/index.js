@@ -21,12 +21,9 @@ let sequelizeOptions = process.env.NODE_ENV === 'production'
   }
   : {};
 
-// connect to Postgres database
 let sequelize = new Sequelize(DATABASE_URL, sequelizeOptions);
 
 let userModel = userSchema(sequelize, DataTypes);
-
-console.log(' *** DATABASE_URL : ', DATABASE_URL);
 
 module.exports = {
   db: sequelize,
