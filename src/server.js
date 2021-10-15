@@ -5,12 +5,13 @@ const express = require('express');
 const app = express();
 const notFoundHandler = require('../src/middleware/404');
 const serverErrorHandler = require('../src/middleware/500');
-const authRouter = require('./auth/router');
+const authRouter = require('./auth/authRouter');
+const mainRouter = require('../src/mainRouter');
 
 app.use(express.json());
-// Process FORM input and put the data on req.body
 app.use(express.urlencoded( { extended: true } ));
 
+app.use(mainRouter);
 app.use(authRouter);
 
 app.use('*',notFoundHandler);
